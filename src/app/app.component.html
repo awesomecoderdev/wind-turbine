@@ -1,5 +1,5 @@
 <main class="main">
-  <div class="bg-white hidden">
+  <div class="bg-white">
     <header class="absolute inset-x-0 top-0 z-50">
       <nav
         class="flex items-center justify-between p-6 lg:px-8"
@@ -245,7 +245,12 @@
     </div>
   </div>
 
-  <app-open-street-map [latitude]="40.7128" [longitude]="-74.006" />
+  <section
+    class="h-[50rem] overflow-hidden border border-purple-300 shadow-xl relative rounded-2xl container mx-auto"
+  >
+    <app-open-street-map [latitude]="40.7128" [longitude]="-74.006" />
+  </section>
+  <div class="h-96"></div>
 </main>
 
 <router-outlet />
