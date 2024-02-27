@@ -125,26 +125,6 @@ export class OpenStreetMapComponent implements OnInit {
       }),
     });
 
-    // Create card overlay for each marker
-    const cardElement = document.createElement('div');
-    cardElement.id = 'popup';
-
-    const popup = new Overlay({
-      element: cardElement,
-      offset: [0, -20], // Offset to adjust card position relative to marker
-      positioning: 'bottom-center',
-      className: `turbine-item`,
-      stopEvent: false,
-      insertFirst: false,
-      autoPan: {
-        animation: {
-          duration: 250,
-        },
-      },
-    });
-
-    self.map.addOverlay(popup);
-
     this.map.on('pointermove', function (e) {
       self.map.getTargetElement().style.cursor = self.map.hasFeatureAtPixel(
         e.pixel
@@ -165,12 +145,12 @@ export class OpenStreetMapComponent implements OnInit {
         image: new Icon({
           anchor: [0.5, 1],
           // size: [250, 250],
-          scale: 0.065, // Scale down the icon to 50% of its original size
-          // src: 'https://openlayers.org/en/latest/examples/data/icon.png', // URL to marker icon
+          // scale: 0.065, // Scale down the icon to 50% of its original size
+          src: 'https://openlayers.org/en/latest/examples/data/icon.png', // URL to marker icon
           // src: 'https://cdn-icons-png.flaticon.com/512/7945/7945007.png',
           // src: 'https://cdn-icons-png.flaticon.com/512/9367/9367346.png',
           // src: 'https://cdn-icons-png.flaticon.com/512/4343/4343449.png',
-          src: 'https://cdn-icons-png.flaticon.com/512/1085/1085678.png',
+          // src: 'https://cdn-icons-png.flaticon.com/512/1085/1085678.png',
         }),
       });
 
@@ -183,62 +163,74 @@ export class OpenStreetMapComponent implements OnInit {
       });
 
       this.map.addLayer(vectorLayer);
+
+      // Create card overlay
+      const cardElement = document.createElement('div');
+      cardElement.className = 'marker-card bg-white rounded p-4';
+      const cardContent = document.createElement('div');
+      cardContent.className = 'card-content';
+      cardElement.appendChild(cardContent);
+
+      const popup = new Overlay({
+        element: cardElement,
+        offset: [0, -20],
+        positioning: 'bottom-center',
+        stopEvent: false,
+        insertFirst: false,
+        autoPan: {
+          animation: {
+            duration: 250,
+          },
+        },
+      });
+
+      // Add overlay to the map
+      this.map.addOverlay(popup);
+
       // Add click event listener to each marker
-
-      // // Create card overlay for each marker
-      // const cardElement = this.renderer.createElement('div');
-      // cardElement.className = 'marker-card bg-white rounded p-4';
-      // cardElement.innerHTML = `
-      //   <div class="card-content">
-      //     <h3>${turbine.name}</h3>
-      //     <p>Height: ${turbine.height_meters} meters</p>
-      //     <p>Capacity: ${turbine.capacity_kw} kW</p>
-      //   </div>
-      // `;
-
-      // const popup = new Overlay({
-      //   element: cardElement,
-      //   offset: [0, -20], // Offset to adjust card position relative to marker
-      //   positioning: 'bottom-center',
-      //   // position: fromLonLat([
-      //   //   turbine.location.longitude,
-      //   //   turbine.location.latitude,
-      //   // ]),
-      //   // className: `hidden turbine-${i}`,
-      //   stopEvent: false,
-      //   // insertFirst: false,
-      //   // autoPan: {
-      //   //   animation: {
-      //   //     duration: 250,
-      //   //   },
-      //   // },
-      // });
-
-      // this.map.addOverlay(popup);
-    });
-
-    // display popup on click
-    this.map.on('pointermove', function (evt) {
-      const marker = self.map.forEachFeatureAtPixel(
-        evt.pixel,
-        function (marker) {
-          return marker;
+      this.map.on('pointermove', (evt) => {
+        const marker = this.map.forEachFeatureAtPixel(
+          evt.pixel,
+          (feature) => feature
+        );
+        if (!marker) {
+          this.popup = false;
+          popup.setPosition(undefined); // Hide the popup
+          return;
         }
-      );
-      if (!marker) {
-        self.popup = false;
-        return;
-      }
 
-      let turbines = self.payload.wind_turbines as WindTurbine[];
-      let turbine: WindTurbine = turbines.filter(
-        (trb: WindTurbine, ind) => ind == marker.getId()
-      )[0];
+        let turbines = this.payload.wind_turbines as WindTurbine[];
+        let turbine = turbines.find(
+          (trb, ind) => ind === marker.getId()
+        ) as WindTurbine;
 
-      self.turbine = turbine;
-      self.popup = true;
+        this.turbine = turbine;
+        this.popup = true;
 
-      console.log('turbine', self.turbine);
+        // Update card content
+        cardContent.innerHTML = `
+        <h3>${this.turbine.name}</h3>
+        <p>Height: ${this.turbine.height_meters} meters</p>
+        <p>Capacity: ${this.turbine.capacity_kw} kW</p>
+      `;
+
+        // Update popup position
+        const coordinate = evt.coordinate;
+        popup.setPosition(coordinate);
+      });
+
+      // Add click event listener to the map to handle clicks outside of the popup
+      this.map.on('click', (evt) => {
+        const marker = this.map.forEachFeatureAtPixel(
+          evt.pixel,
+          (feature) => feature
+        );
+        if (!marker) {
+          this.popup = false;
+          popup.setPosition(undefined); // Hide the popup
+          return;
+        }
+      });
     });
   }
 }
