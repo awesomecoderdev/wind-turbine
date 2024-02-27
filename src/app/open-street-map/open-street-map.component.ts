@@ -19,7 +19,9 @@ import { Icon, Style } from 'ol/style';
 import Overlay from 'ol/Overlay';
 import { toStringHDMS } from 'ol/coordinate';
 import Select from 'ol/interaction/Select';
-
+import { CommonModule } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, PLATFORM_ID } from '@angular/core';
 interface WindTurbine {
   name: string;
   location: {
@@ -45,7 +47,7 @@ interface Payload {
 @Component({
   selector: 'app-open-street-map',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './open-street-map.component.html',
   styleUrl: './open-street-map.component.css',
 })
@@ -96,10 +98,12 @@ export class OpenStreetMapComponent implements OnInit {
   turbine!: WindTurbine;
   popup: boolean = false;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(@Inject(PLATFORM_ID) private path: Object) {}
 
   ngOnInit(): void {
-    this.initMap();
+    if (isPlatformBrowser(this.path)) {
+      this.initMap();
+    }
   }
 
   private initMap(): void {
@@ -122,7 +126,7 @@ export class OpenStreetMapComponent implements OnInit {
     });
 
     // Create card overlay for each marker
-    const cardElement = self.renderer.createElement('div');
+    const cardElement = document.createElement('div');
     cardElement.id = 'popup';
 
     const popup = new Overlay({
@@ -161,12 +165,12 @@ export class OpenStreetMapComponent implements OnInit {
         image: new Icon({
           anchor: [0.5, 1],
           // size: [250, 250],
-          // scale: 0.065, // Scale down the icon to 50% of its original size
-          src: 'https://openlayers.org/en/latest/examples/data/icon.png', // URL to marker icon
+          scale: 0.065, // Scale down the icon to 50% of its original size
+          // src: 'https://openlayers.org/en/latest/examples/data/icon.png', // URL to marker icon
           // src: 'https://cdn-icons-png.flaticon.com/512/7945/7945007.png',
           // src: 'https://cdn-icons-png.flaticon.com/512/9367/9367346.png',
           // src: 'https://cdn-icons-png.flaticon.com/512/4343/4343449.png',
-          // src: 'https://cdn-icons-png.flaticon.com/512/1085/1085678.png',
+          src: 'https://cdn-icons-png.flaticon.com/512/1085/1085678.png',
         }),
       });
 
