@@ -22,6 +22,10 @@ import Select from 'ol/interaction/Select';
 import { CommonModule } from '@angular/common';
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, PLATFORM_ID } from '@angular/core';
+import * as WindTurbineJsonData from '../../assets/data.json';
+import { Subject } from 'rxjs';
+import { StyleLike } from 'ol/style/Style';
+
 interface WindTurbine {
   name: string;
   location: {
@@ -97,10 +101,22 @@ export class OpenStreetMapComponent implements OnInit {
   };
   turbine!: WindTurbine;
   popup: boolean = false;
+  toggle: boolean = true;
+
+  toggleButton() {
+    if (this.toggle) {
+      this.removeMarker();
+    } else {
+      this.addMarker();
+    }
+
+    this.toggle = !this.toggle;
+  }
 
   constructor(@Inject(PLATFORM_ID) private path: Object) {}
 
   ngOnInit(): void {
+    this.payload = WindTurbineJsonData;
     if (isPlatformBrowser(this.path)) {
       this.initMap();
     }
@@ -133,6 +149,10 @@ export class OpenStreetMapComponent implements OnInit {
         : '';
     });
 
+    this.addMarker();
+  }
+
+  private addMarker(): void {
     // Add markers for wind turbines
     this.payload.wind_turbines.forEach((turbine, i) => {
       const marker = new Feature({
@@ -209,10 +229,10 @@ export class OpenStreetMapComponent implements OnInit {
 
         // Update card content
         cardContent.innerHTML = `
-        <h3>${this.turbine.name}</h3>
-        <p>Height: ${this.turbine.height_meters} meters</p>
-        <p>Capacity: ${this.turbine.capacity_kw} kW</p>
-      `;
+          <h3>${this.turbine.name}</h3>
+          <p>Height: ${this.turbine.height_meters} meters</p>
+          <p>Capacity: ${this.turbine.capacity_kw} kW</p>
+        `;
 
         // Update popup position
         const coordinate = evt.coordinate;
@@ -225,12 +245,26 @@ export class OpenStreetMapComponent implements OnInit {
           evt.pixel,
           (feature) => feature
         );
+
         if (!marker) {
           this.popup = false;
           popup.setPosition(undefined); // Hide the popup
           return;
         }
       });
+    });
+  }
+
+  private removeMarker(): void {
+    // Iterate through the layers of the map
+    this.map.getLayers().forEach((layer) => {
+      // Check if the layer is a VectorLayer and contains features
+      if (
+        layer instanceof VectorLayer &&
+        layer.getSource().getFeatures().length > 0
+      ) {
+        layer.getSource().clear();
+      }
     });
   }
 }

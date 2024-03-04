@@ -1,0 +1,127 @@
+{
+  "city": "Example City",
+  "country": "Example Country",
+  "location": {
+    "latitude": 40.7128,
+    "longitude": -74.006
+  },
+  "wind_turbines": [
+    {
+      "name": "Wind Turbine 1",
+      "location": {
+        "latitude": 40.714,
+        "longitude": -74.009
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 2222",
+      "location": {
+        "latitude": 40.716,
+        "longitude": -74.011
+      },
+      "height_meters": 80,
+      "capacity_kw": 1500
+    },
+    {
+      "name": "Wind Turbine 3",
+      "location": {
+        "latitude": 40.718,
+        "longitude": -74.013
+      },
+      "height_meters": 120,
+      "capacity_kw": 2500
+    },
+    {
+      "name": "Wind Turbine 11",
+      "location": {
+        "latitude": 40.716235,
+        "longitude": -74.011647
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 12",
+      "location": {
+        "latitude": 40.716781,
+        "longitude": -74.010306
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 13",
+      "location": {
+        "latitude": 40.715593,
+        "longitude": -74.011018
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 14",
+      "location": {
+        "latitude": 40.716407,
+        "longitude": -74.010694
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 15",
+      "location": {
+        "latitude": 40.715976,
+        "longitude": -74.010417
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 16",
+      "location": {
+        "latitude": 40.716213,
+        "longitude": -74.011526
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 17",
+      "location": {
+        "latitude": 40.715862,
+        "longitude": -74.010835
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 18",
+      "location": {
+        "latitude": 40.716202,
+        "longitude": -74.010214
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 19",
+      "location": {
+        "latitude": 40.715651,
+        "longitude": -74.010946
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    },
+    {
+      "name": "Wind Turbine 20",
+      "location": {
+        "latitude": 40.716699,
+        "longitude": -74.011324
+      },
+      "height_meters": 100,
+      "capacity_kw": 2000
+    }
+  ]
+}
