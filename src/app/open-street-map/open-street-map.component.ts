@@ -42,10 +42,10 @@ interface Location {
 }
 
 interface Payload {
-  city: string;
-  country: string;
-  location: Location;
-  wind_turbines: WindTurbine[];
+  city?: string;
+  country?: string;
+  location?: Location;
+  wind_turbines?: WindTurbine[];
 }
 
 @Component({
@@ -60,45 +60,7 @@ export class OpenStreetMapComponent implements OnInit {
   @Input() latitude!: number; // Add '!' here
   @Input() longitude!: number; // Add '!' here
   map!: Map; // Add '!' here
-  payload: Payload = {
-    city: 'Example City',
-    country: 'Example Country',
-    location: {
-      // latitude: this.latitude ?? 40.7128,
-      // longitude: this.longitude ?? -74.006,
-      latitude: 40.7128,
-      longitude: -74.006,
-    },
-    wind_turbines: [
-      {
-        name: 'Wind Turbine 1',
-        location: {
-          latitude: 40.714,
-          longitude: -74.009,
-        },
-        height_meters: 100,
-        capacity_kw: 2000,
-      },
-      {
-        name: 'Wind Turbine 2',
-        location: {
-          latitude: 40.716,
-          longitude: -74.011,
-        },
-        height_meters: 80,
-        capacity_kw: 1500,
-      },
-      {
-        name: 'Wind Turbine 3',
-        location: {
-          latitude: 40.718,
-          longitude: -74.013,
-        },
-        height_meters: 120,
-        capacity_kw: 2500,
-      },
-    ],
-  };
+  payload: Payload = {};
   turbine!: WindTurbine;
   popup: boolean = false;
   toggle: boolean = true;
@@ -124,6 +86,7 @@ export class OpenStreetMapComponent implements OnInit {
 
   private initMap(): void {
     let self = this;
+
     this.map = new Map({
       target: this.mapElement.nativeElement,
       layers: [
@@ -134,8 +97,8 @@ export class OpenStreetMapComponent implements OnInit {
       view: new View({
         // center: [0, 0],
         center: fromLonLat([
-          this.payload.location.longitude,
-          this.payload.location.latitude,
+          this.payload.location ? this.payload.location.longitude : 0,
+          this.payload.location ? this.payload.location.latitude : 0,
         ]),
         zoom: 14,
       }),
@@ -154,105 +117,107 @@ export class OpenStreetMapComponent implements OnInit {
 
   private addMarker(): void {
     // Add markers for wind turbines
-    this.payload.wind_turbines.forEach((turbine, i) => {
-      const marker = new Feature({
-        geometry: new Point(
-          fromLonLat([turbine.location.longitude, turbine.location.latitude])
-        ),
-      });
+    if (this.payload.wind_turbines) {
+      this.payload.wind_turbines.forEach((turbine, i) => {
+        const marker = new Feature({
+          geometry: new Point(
+            fromLonLat([turbine.location.longitude, turbine.location.latitude])
+          ),
+        });
 
-      const iconStyle = new Style({
-        image: new Icon({
-          anchor: [0.5, 1],
-          // size: [250, 250],
-          // scale: 0.065, // Scale down the icon to 50% of its original size
-          src: 'https://openlayers.org/en/latest/examples/data/icon.png', // URL to marker icon
-          // src: 'https://cdn-icons-png.flaticon.com/512/7945/7945007.png',
-          // src: 'https://cdn-icons-png.flaticon.com/512/9367/9367346.png',
-          // src: 'https://cdn-icons-png.flaticon.com/512/4343/4343449.png',
-          // src: 'https://cdn-icons-png.flaticon.com/512/1085/1085678.png',
-        }),
-      });
+        const iconStyle = new Style({
+          image: new Icon({
+            anchor: [0.5, 1],
+            // size: [250, 250],
+            // scale: 0.065, // Scale down the icon to 50% of its original size
+            src: 'https://openlayers.org/en/latest/examples/data/icon.png', // URL to marker icon
+            // src: 'https://cdn-icons-png.flaticon.com/512/7945/7945007.png',
+            // src: 'https://cdn-icons-png.flaticon.com/512/9367/9367346.png',
+            // src: 'https://cdn-icons-png.flaticon.com/512/4343/4343449.png',
+            // src: 'https://cdn-icons-png.flaticon.com/512/1085/1085678.png',
+          }),
+        });
 
-      marker.setStyle(iconStyle);
-      marker.setId(i);
-      const vectorLayer = new VectorLayer({
-        source: new VectorSource({
-          features: [marker],
-        }),
-      });
+        marker.setStyle(iconStyle);
+        marker.setId(i);
+        const vectorLayer = new VectorLayer({
+          source: new VectorSource({
+            features: [marker],
+          }),
+        });
 
-      this.map.addLayer(vectorLayer);
+        this.map.addLayer(vectorLayer);
 
-      // Create card overlay
-      const cardElement = document.createElement('div');
-      cardElement.className = 'marker-card bg-white rounded p-4';
-      const cardContent = document.createElement('div');
-      cardContent.className = 'card-content';
-      cardElement.appendChild(cardContent);
+        // Create card overlay
+        const cardElement = document.createElement('div');
+        cardElement.className = 'marker-card bg-white rounded p-4';
+        const cardContent = document.createElement('div');
+        cardContent.className = 'card-content';
+        cardElement.appendChild(cardContent);
 
-      const popup = new Overlay({
-        element: cardElement,
-        offset: [0, -20],
-        positioning: 'bottom-center',
-        stopEvent: false,
-        insertFirst: false,
-        autoPan: {
-          animation: {
-            duration: 250,
+        const popup = new Overlay({
+          element: cardElement,
+          offset: [0, -20],
+          positioning: 'bottom-center',
+          stopEvent: false,
+          insertFirst: false,
+          autoPan: {
+            animation: {
+              duration: 250,
+            },
           },
-        },
+        });
+
+        // Add overlay to the map
+        this.map.addOverlay(popup);
+
+        // Add click event listener to each marker
+        this.map.on('pointermove', (evt) => {
+          const marker = this.map.forEachFeatureAtPixel(
+            evt.pixel,
+            (feature) => feature
+          );
+          if (!marker) {
+            this.popup = false;
+            popup.setPosition(undefined); // Hide the popup
+            return;
+          }
+
+          let turbines = this.payload.wind_turbines as WindTurbine[];
+          let turbine = turbines.find(
+            (trb, ind) => ind === marker.getId()
+          ) as WindTurbine;
+
+          this.turbine = turbine;
+          this.popup = true;
+
+          // Update card content
+          cardContent.innerHTML = `
+            <h3>${this.turbine.name}</h3>
+            <p>Height: ${this.turbine.height_meters} meters</p>
+            <p>Capacity: ${this.turbine.capacity_kw} kW</p>
+          `;
+
+          // Update popup position
+          const coordinate = evt.coordinate;
+          popup.setPosition(coordinate);
+        });
+
+        // Add click event listener to the map to handle clicks outside of the popup
+        this.map.on('click', (evt) => {
+          const marker = this.map.forEachFeatureAtPixel(
+            evt.pixel,
+            (feature) => feature
+          );
+
+          if (!marker) {
+            this.popup = false;
+            popup.setPosition(undefined); // Hide the popup
+            return;
+          }
+        });
       });
-
-      // Add overlay to the map
-      this.map.addOverlay(popup);
-
-      // Add click event listener to each marker
-      this.map.on('pointermove', (evt) => {
-        const marker = this.map.forEachFeatureAtPixel(
-          evt.pixel,
-          (feature) => feature
-        );
-        if (!marker) {
-          this.popup = false;
-          popup.setPosition(undefined); // Hide the popup
-          return;
-        }
-
-        let turbines = this.payload.wind_turbines as WindTurbine[];
-        let turbine = turbines.find(
-          (trb, ind) => ind === marker.getId()
-        ) as WindTurbine;
-
-        this.turbine = turbine;
-        this.popup = true;
-
-        // Update card content
-        cardContent.innerHTML = `
-          <h3>${this.turbine.name}</h3>
-          <p>Height: ${this.turbine.height_meters} meters</p>
-          <p>Capacity: ${this.turbine.capacity_kw} kW</p>
-        `;
-
-        // Update popup position
-        const coordinate = evt.coordinate;
-        popup.setPosition(coordinate);
-      });
-
-      // Add click event listener to the map to handle clicks outside of the popup
-      this.map.on('click', (evt) => {
-        const marker = this.map.forEachFeatureAtPixel(
-          evt.pixel,
-          (feature) => feature
-        );
-
-        if (!marker) {
-          this.popup = false;
-          popup.setPosition(undefined); // Hide the popup
-          return;
-        }
-      });
-    });
+    }
   }
 
   private removeMarker(): void {

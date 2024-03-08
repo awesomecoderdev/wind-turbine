@@ -1,0 +1,17 @@
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+section {
+  height: 80vh;
+  overflow: hidden;
+  border: 1px solid #c4b5fd;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 1280px;
+}

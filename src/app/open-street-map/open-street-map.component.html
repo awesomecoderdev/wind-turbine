@@ -1,18 +1,13 @@
-<div class="absolute top-16 left-2 z-50 bg-white rounded-full">
+<div class="container">
   <div
     [ngClass]="{
-      'bg-indigo-600 ring-black/20': toggle,
-      'bg-slate-900/10 ring-slate-900/5': !toggle
+      active: toggle,
+      deactivate: !toggle
     }"
     (click)="toggleButton()"
-    class="ml-auto cursor-pointer pointer-events-auto h-6 w-10 rounded-full p-1 ring-1 ring-inset transition duration-200 ease-in-out"
+    class="button"
   >
-    <div
-      [ngClass]="{
-        'translate-x-4': toggle,
-      }"
-      class="h-4 w-4 rounded-full bg-white shadow-sm ring-1 ring-slate-700/10 transition duration-200 ease-in-out"
-    ></div>
+    <div class="button-point"></div>
   </div>
 </div>
-<div #map class="map w-full h-full z-0"></div>
+<div #map class="map"></div>

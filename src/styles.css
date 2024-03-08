@@ -1,7 +1,2 @@
 /* map css */
 @import "ol/ol.css";
-
-/* tailwind css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
